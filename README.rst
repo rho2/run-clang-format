@@ -36,17 +36,9 @@ It's possible to exclude paths from the recursive search::
       --exclude '*_test.cpp' \
       src include foo.cpp
 
-
-Continuous integration
-======================
-
-Check `.travis.yml <.travis.yml>`_.
-
-For an example of failure in logs, click the badge (build is broken on purpose):
-
-.. image:: https://travis-ci.org/Sarcasm/run-clang-format.svg?branch=master
-    :target: https://travis-ci.org/Sarcasm/run-clang-format
-
+Docker
+======
+  docker run -v "$(pwd)":/files [imagename] [arguments]
 
 FAQ
 ===
