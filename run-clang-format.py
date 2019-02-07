@@ -21,6 +21,8 @@ import signal
 import subprocess
 import sys
 import traceback
+import magic
+
 
 from functools import partial
 
@@ -99,43 +101,22 @@ def run_clang_format_diff_wrapper(args, file):
                                                   e), e)
 
 
-def run_clang_format_diff(args, file):
-    try:
-        with open(file, 'r') as f:
-            original = f.readlines()
-    except IOError as exc:
-        raise DiffError(str(exc))
+def run_clang_format_diff(args, file):      
+    blob = open(file).read()
+    m = magic.Magic(mime_encoding=True)
+    encoding = m.from_buffer(blob)
+
+    with open(file, 'r', encoding=encoding) as f:
+        original = f.readlines()
+
     invocation = [args.clang_format_executable, "-style={}".format(args.style), file]
-
-    # Use of utf-8 to decode the process output.
-    #
-    # Hopefully, this is the correct thing to do.
-    #
-    # It's done due to the following assumptions (which may be incorrect):
-    # - clang-format will returns the bytes read from the files as-is,
-    #   without conversion, and it is already assumed that the files use utf-8.
-    # - if the diagnostics were internationalized, they would use utf-8:
-    #   > Adding Translations to Clang
-    #   >
-    #   > Not possible yet!
-    #   > Diagnostic strings should be written in UTF-8,
-    #   > the client can translate to the relevant code page if needed.
-    #   > Each translation completely replaces the format string
-    #   > for the diagnostic.
-    #   > -- http://clang.llvm.org/docs/InternalsManual.html#internals-diag-translation
-    #
-    # It's not pretty, due to Python 2 & 3 compatibility.
-    encoding_py3 = {}
-    if sys.version_info[0] >= 3:
-        encoding_py3['encoding'] = 'utf-8'
-
+    
     try:
         proc = subprocess.Popen(
             invocation,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
-            **encoding_py3)
+            universal_newlines=True)
     except OSError as exc:
         raise DiffError(str(exc))
     proc_stdout = proc.stdout
