@@ -21,7 +21,6 @@ import signal
 import subprocess
 import sys
 import traceback
-import magic
 
 
 from functools import partial
@@ -102,12 +101,7 @@ def run_clang_format_diff_wrapper(args, file):
 
 
 def run_clang_format_diff(args, file):
-    print("Checking the encoding")
-    m = magic.Magic()
-    encoding = m.from_file(file)
-    print(encoding)
-
-    with open(file, 'r', encoding=encoding) as f:
+    with open(file, 'r', error='surrogateescape') as f:
         original = f.readlines()
 
     invocation = [args.clang_format_executable, "-style={}".format(args.style), file]
