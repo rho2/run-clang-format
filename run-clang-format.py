@@ -102,17 +102,14 @@ def run_clang_format_diff_wrapper(args, file):
 
 
 def run_clang_format_diff(args, file):      
-    blob = open(file).read()
     m = magic.Magic(mime_encoding=True)
-    encoding = m.from_buffer(blob)
+    encoding = m.from_file(file)
 
-    print(encoding)
-    
     with open(file, 'r', encoding=encoding) as f:
         original = f.readlines()
 
     invocation = [args.clang_format_executable, "-style={}".format(args.style), file]
-    
+
     try:
         proc = subprocess.Popen(
             invocation,
