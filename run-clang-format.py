@@ -21,6 +21,7 @@ import signal
 import subprocess
 import sys
 import traceback
+import magic
 
 
 from functools import partial
@@ -100,8 +101,11 @@ def run_clang_format_diff_wrapper(args, file):
                                                   e), e)
 
 
-def run_clang_format_diff(args, file):
-    with open(file, 'r', errors='surrogateescape') as f:
+def run_clang_format_diff(args, file):      
+    m = magic.Magic(mime_encoding=True)
+    encoding = m.from_file(file)
+
+    with open(file, 'r', encoding=encoding) as f:
         original = f.readlines()
 
     invocation = [args.clang_format_executable, "-style={}".format(args.style), file]
@@ -116,15 +120,9 @@ def run_clang_format_diff(args, file):
         raise DiffError(str(exc))
     proc_stdout = proc.stdout
     proc_stderr = proc.stderr
-    if sys.version_info[0] < 3:
-        # make the pipes compatible with Python 3,
-        # reading lines should output unicode
-        encoding = 'utf-8'
-        proc_stdout = codecs.getreader(encoding)(proc_stdout)
-        proc_stderr = codecs.getreader(encoding)(proc_stderr)
-    # hopefully the stderr pipe won't get full and block the process
-    outs = list(proc_stdout.readlines())
-    errs = list(proc_stderr.readlines())
+
+    outs = list(proc.stdout.readlines())
+    errs = list(proc.stderr.readlines())
     proc.wait()
     if proc.returncode:
         raise DiffError("clang-format exited with status {}: '{}'".format(
