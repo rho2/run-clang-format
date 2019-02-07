@@ -101,7 +101,7 @@ def run_clang_format_diff_wrapper(args, file):
 
 def run_clang_format_diff(args, file):
     try:
-        with io.open(file, 'r', encoding='utf-8') as f:
+        with open(file, 'r') as f:
             original = f.readlines()
     except IOError as exc:
         raise DiffError(str(exc))
