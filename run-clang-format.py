@@ -101,7 +101,7 @@ def run_clang_format_diff_wrapper(args, file):
 
 
 def run_clang_format_diff(args, file):
-    with open(file, 'r', error='surrogateescape') as f:
+    with open(file, 'r', errors='surrogateescape') as f:
         original = f.readlines()
 
     invocation = [args.clang_format_executable, "-style={}".format(args.style), file]
