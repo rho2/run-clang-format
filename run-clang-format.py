@@ -121,8 +121,9 @@ def run_clang_format_diff(args, file):
     proc_stdout = proc.stdout
     proc_stderr = proc.stderr
 
-    outs = list(proc.stdout.readlines())
-    errs = list(proc.stderr.readlines())
+    outs = proc.stdout.read().split("\r\n")
+    errs = proc.stderr.read().split("\r\n")
+
     proc.wait()
     if proc.returncode:
         raise DiffError("clang-format exited with status {}: '{}'".format(
