@@ -106,6 +106,8 @@ def run_clang_format_diff(args, file):
     m = magic.Magic(mime_encoding=True)
     encoding = m.from_buffer(blob)
 
+    print(encoding)
+    
     with open(file, 'r', encoding=encoding) as f:
         original = f.readlines()
 
