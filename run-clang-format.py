@@ -118,10 +118,10 @@ def run_clang_format_diff(args, file):
             universal_newlines=True)
     except OSError as exc:
         raise DiffError(str(exc))
-    proc_stdout = proc.stdout
-    proc_stderr = proc.stderr
+    proc_stdout = io.TextIOWrapper(proc.stdout.buffer, encoding="utf8", errors='ignore')
+    proc_stderr = io.TextIOWrapper(proc.stderr.buffer, encoding="utf8", errors='ignore')
 
-    outs = proc.stdout.read().split("\r\n")
+    outs = proc_stdout.read().split("\r\n")
     errs = proc.stderr.read().split("\r\n")
 
     proc.wait()
